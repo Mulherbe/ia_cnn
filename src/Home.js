@@ -107,7 +107,7 @@ const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percen
 
       <div className="stats">
         <ul>
-          {results.map((result, index) => (
+          {results.reverse().map((result, index) => (
             <li key={index} className={result.isCorrect ? 'correct' : 'incorrect'}>
               {result.prediction} - {result.isCorrect ? 'Correct' : 'Incorrect'}
             </li>
