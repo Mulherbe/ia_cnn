@@ -7,7 +7,7 @@ function App() {
 
   return (
 
-<div >
+<div className="wrapper" >
     <Home />
 </div>
   );

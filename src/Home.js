@@ -26,17 +26,22 @@ function Home() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
   const incorrectCount = results.filter((result) => !result.isCorrect).length;
-const totalCount = results.length;
-const percentage = totalCount > 0 ? ((incorrectCount / totalCount) * 100).toFixed(2) : 0;
-const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percentage}%)`;
+  console.log(incorrectCount)
+  const totalCount = results.length;
+  const percentage = totalCount > 0 ? ((incorrectCount / totalCount) * 100).toFixed(2) : 0;
+  const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percentage}%)`;
   useEffect(() => {
-    const fetchData = async () => {
-      const querySnapshot = await db.collection("results").get();
-      const fetchedResults = querySnapshot.docs.map((doc) => doc.data());
-      setResults(fetchedResults);
+    const unsubscribe = db
+      .collection("results")
+      .orderBy("id", "desc")
+      .onSnapshot((snapshot) => {
+        const resultsList = snapshot.docs.map((doc) => doc.data());
+        setResults(resultsList);
+      });
+  
+    return () => {
+      unsubscribe();
     };
-
-    fetchData();
   }, []);
 
   const loadModel = async () => {
@@ -45,8 +50,9 @@ const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percen
   };
 
   const predictImage = async (imageElement) => {
+    console.log(results )
     if (!model) return;
-  
+
     const tensor = tf.browser
       .fromPixels(imageElement)
       .resizeNearestNeighbor([150, 150])
@@ -73,14 +79,24 @@ const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percen
     reader.readAsDataURL(imageFile);
   };
 
+  const sortResultsDescending = (results) => {
+    return results.sort((a, b) => b.id - a.id);
+  };
+
   const handleResult = async (event) => {
     const isCorrect = event.target.value === "true";
-    const newResult = { prediction, isCorrect };
+    const batch = db.batch();
+    const counterRef = db.collection("counters").doc("resultsCounter");
+    batch.update(counterRef, { count: firebase.firestore.FieldValue.increment(1) });
+    const counterSnapshot = await counterRef.get();
+    const newCount = counterSnapshot.data().count + 1;
+    const newResult = { id: newCount, prediction, isCorrect };
+    const newResultRef = db.collection("results").doc(newCount.toString());
+    batch.set(newResultRef, newResult);
+    await batch.commit();
+    setPrediction(null);
+    setImagePreviewUrl(null);
 
-    await db.collection("results").add(newResult);
-
-    setResults((prevResults) => [...prevResults, newResult]);
-    setPrediction(null)
   };
 
   useEffect(() => {
@@ -89,53 +105,47 @@ const statsText = `Total : ${totalCount} | Erreurs : ${incorrectCount} (${percen
 
   return (
 
-<div className="App">
-  
-  <div className="container">
-    <div className="left">
-      <h2>Statistiques</h2>
-      <div className="stats">
-  <p>{statsText}</p>
-  <ul>
-    {results.map((result, index) => (
-      <li key={index} className={result.isCorrect ? 'correct' : 'incorrect'}>
-        {result.prediction} - {result.isCorrect ? 'Correct' : 'Incorrect'}
-      </li>
-    ))}
-  </ul>
-</div>
+    <div className="App">
+      <div className="container">
+        <div className="left">
+          <h2>Statistiques</h2>
+          <div className="stats">
+            <p>{statsText}</p>
+          </div>
 
-      <div className="stats">
-        <ul>
-          {results.reverse().map((result, index) => (
-            <li key={index} className={result.isCorrect ? 'correct' : 'incorrect'}>
-              {result.prediction} - {result.isCorrect ? 'Correct' : 'Incorrect'}
-            </li>
-          ))}
-        </ul>
+          <div className="stats">
+            <ul>
+              {results.reverse().map((result, index) => (
+                <li key={index} className={result.isCorrect ? 'correct' : 'incorrect'}>
+                {result.id}  {result.prediction} - {result.isCorrect ? 'Correct' : 'Incorrect'}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        
+        <div className="right">
+          <label for="file" class="label-file">Choisir une image</label>    
+          <input id="file" class="input-file" type="file" onChange={handleImageUpload} ></input>
+          {prediction && <div className="accuracy">Prédiction : {prediction}</div>}
+          {prediction && (
+            <div className="buttons">
+              <button className="true" value="true" onClick={handleResult}>
+                Vrai
+              </button>
+              <button className="false" value="false" onClick={handleResult}>
+                Faux
+              </button>
+            </div>
+          )}
+          {imagePreviewUrl && (
+            <div >
+              <img src={imagePreviewUrl} alt=" preview" className="image-preview" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
-    <div className="right">
-      <input type="file" onChange={handleImageUpload} />
-      {prediction && <div className="accuracy">Prédiction : {prediction}</div>}
-      {prediction && (
-        <div className="buttons">
-          <button className="true" value="true" onClick={handleResult}>
-            Vrai
-          </button>
-          <button className="false" value="false" onClick={handleResult}>
-            Faux
-          </button>
-        </div>
-      )}
-        {imagePreviewUrl && (
-    <div >
-      <img src={imagePreviewUrl} alt=" preview" className="image-preview" />
-    </div>
-  )}
-    </div>
-  </div>
-</div>
   );
 }
 

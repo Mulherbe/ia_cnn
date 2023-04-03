@@ -2,15 +2,20 @@ body {
   font-family: 'Roboto', sans-serif;
   background: linear-gradient(45deg, #3c3c3c, #1c1c1c);
   color: #ffffff;
-  margin:10%;
-}
+  box-shadow: 0 0 10px #8985ff94, 0 0 20px #8985ff94, 0 0 30px #8985ff94, 0 0 40px #8985ff94;
 
+}
+.wrapper{
+  background-image: url("../public/bg.png");
+  padding:9%;
+  margin:1%;
+}
 .App {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   min-height: 100vh;
+
 }
 
 .container {
@@ -57,7 +62,7 @@ h1 {
 
 
 label {
-  background-color: #4d4dff;
+  background-color:#3c3c3c,;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -76,6 +81,15 @@ label {
   text-shadow: 0 0 10px #8985ff94, 0 0 20px #8985ff94, 0 0 30px #8985ff94, 0 0 40px #8985ff94;
 }
 
+.correct{
+  font-size: 20px;
+  text-shadow: 0 0 10px #85ff9594, 0 0 20px #a2ff8594, 0 0 30px #a8ff8594, 0 0 40px #93ff8594;
+}
+.incorrect{
+  font-size: 20px;
+  text-shadow: 0 0 10px #ff858b94, 0 0 20px #ff859994, 0 0 30px #ff858594, 0 0 40px #ff859994;
+}
+
 .accuracy {
   margin-top: 20px;
   font-size: 1.5rem;
@@ -86,17 +100,48 @@ label {
     font-size: 1.5rem;
     margin-right: 25px;
     cursor: pointer;
-    text-shadow: 0 0 10px rgba(0, 128, 0, 0.425), 0 0 20px rgba(0, 128, 0, 0.425), 0 0 30px rgba(0, 128, 0, 0.425), 0 0 40px rgba(0, 128, 0, 0.425);
+    text-decoration: none;
+    background-color: #ff000000;    
+    color:white;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 20px 5px 20px;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.493), 0 0 20px rgba(0, 255, 0, 0.493), 0 0 30px rgba(0, 255, 0, 0.493), 0 0 40px rgba(0, 255, 0, 0.493);
 }
 
 .false {   
   margin-top: 20px;
    font-size: 1.5rem;
    cursor: pointer;
-   text-shadow: 0 0 10px rgba(255, 0, 0, 0.432), 0 0 20px rgba(255, 0, 0, 0.432), 0 0 30px rgba(255, 0, 0, 0.432), 0 0 40px rgba(255, 0, 0, 0.432);
+   background-color: #ff000000;
+    color:white;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 20px 5px 20px;
+   box-shadow: 0 0 10px rgba(238, 27, 27, 0.651), 0 0 20px rgba(238, 27, 27, 0.651), 0 0 30px rgba(238, 27, 27, 0.651), 0 0 40px rgba(238, 27, 27, 0.651);
 }
 
 .image-preview{
-  width: 224px;
+  width: 448px;
   margin-top: 10vh;
+  box-shadow: 0 0 10px #8985ff94, 0 0 10px #8985ff94, 0 0 10px #8985ff94, 0 0 10px #8985ff94;
+  border-radius: 25px;
+}
+
+.inputFile{
+  decoration:none;
+}
+
+.label-file {
+  cursor: pointer;
+  background: #3a393ae0;
+  color: white;
+  font-weight: bold;
+}
+.label-file:hover {
+  color: white;
+}
+
+.input-file {
+  display: none;
 }
